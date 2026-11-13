@@ -1,0 +1,73 @@
+期末專題提案：Hybrid Technical & Price Action Agent (Hybrid TPA-Agent)
+結合確定性供需區演算法、機器學習勝率預測與 LLM 推理之短線交易智慧代理人系統
+摘要 (Abstract)
+在波動劇烈且資訊雜訊充斥的現代金融短線交易與當沖市場中，交易員經常面臨情緒干擾、多維度技術指標過載以及無法即時判讀價格行為空間結構的困境。現有量化工具多半僅依賴單一技術指標或純統計回測，缺乏對支撐壓力與供需區（Supply & Demand Zones）的動態空間感知能力；而純大型語言模型（LLM）則因不擅長精確數值計算而容易產生幻覺，無法直接作為可靠的交易決策核心。為了解決上述問題，本專題提出一個全新的混合型技術與價格行為交易代理人系統（Hybrid Technical & Price Action Agent, Hybrid TPA-Agent）。該系統採用創新混合式架構，結合確定性演算法自動偵測供需區、機器學習分類器（XGBoost）計算突破與反彈勝率，以及 LLM 規劃與推理代理人進行價格行為學領域推理與動態風控計算。本研究預期採用歷史 OHLCV 基準資料集與回測框架進行個案研究（Case Study），對比傳統單一指標策略，評估指標包含勝率預測準確率、風險報酬比（Risk-to-Reward Ratio）與最大回撤率（Max Drawdown）。預期本系統能有效濾除市場雜訊，自動產出具備客觀數學與價格行為學依據的短線高勝率交易設定與結構化報告。
+1. Introduction (緒論)
+在現代金融市場中，短線交易與當沖操作因高流動性與潛在的高報酬率，吸引了大量非專業交易員與一般散戶投資人的參與。然而，面對瞬息萬變且高度波動的盤面，非專業交易員往往因缺乏系統化的訓練，在面對海量即時行情數據時，極易陷入資訊過載與決策延遲的困境。這種心理與認知上的負荷，常導致一般投資人受到恐懼與貪婪等情緒干擾，進而作出非理性的交易決策，造成錯失最佳進出場良機或無謂擴大虧損的遺憾。
+價格行為學（Price Action）與市場結構（Market Structure）分析，一直以來被視為短線交易領域中最核心的決策工具。透過識別關鍵的支撐壓力區（Support & Resistance, SNR）以及由買賣雙方力道失衡所形成的供需區（Supply & Demand Zones），交易員能夠掌握價格在空間結構中的轉折與延續點。然而對非專業交易員而言，要在極短的時間內同時完成「大量歷史 K 線空間結構標記」、「運用機器學習進行勝率與機率預測」以及「計算嚴格的風險報酬比（Risk-to-Reward Ratio）與倉位控制」，在認知與執行層面上幾乎是無法實現的高難度任務。
+現有的輔助工具在解決上述問題時面臨顯著的侷限性。傳統的指標型量化工具（如 MA、RSI、MACD 等）普遍具備滯後性，且無法理解圖表上的「整體結構與情境脈絡」，容易產出大量虛假的雜訊訊號；而近年興起的生成式大型語言模型（LLM）雖具備強大的文本邏輯推理能力，卻因缺乏確定性的數學計算與空間運算模組，在處理精確金融數字與價格結構時極易發生嚴重的「幻覺（Hallucination）」，無法直接作為可靠的交易決策工具。
+為了突破上述限制並賦予非專業交易員具備專業級的短線決策能力，本研究提出一種創新的混合型技術與價格行為交易代理人系統（Hybrid Technical & Price Action Agent, Hybrid TPA-Agent）。本系統獨創「確定性演算法（空間結構標記） + 機器學習（勝率與機率計算） + LLM Agent（情境決策與風控）」的三層式混合架構，在保留規則演算法嚴謹性的同時，融入 AI 的機率預測與邏輯推理能力。
+1.1 核心貢獻 (Contributions)
+1. 建立高靈敏度且兼具嚴謹性的短線交易 AI 代理人架構： 整合確定性空間演算法、機器學習與 LLM 推理，為非專業交易員提供穩定且具客觀依據的決策輔助。2. 實現價格行為學領域知識與機器學習預測的深度融合： 成功將市場結構、供需區等空間概念轉化為確定性程式化規則，並結合 XGBoost 進行勝率評估。3. 提供具備高度可複現性與模組化之開源專案架構： 提供完整的系統設計規格說明（DESIGN.md）與可重複驗證的程式碼庫，促進後續學術研究與量化社群之擴展應用。
+2. Related Work (相關研究)
+2.1 Machine Learning for Technical Analysis and Trend Prediction
+在傳統量化交易領域，機器學習分類器（如 XGBoost、Random Forest、SVM 等）已被廣泛應用於高頻與日內交易（Intraday Trading）之趨勢預測。文獻指出，Gradient Boosting 演算法（特別是 XGBoost）在處理結構化金融時間序列與技術指標（如 RSI、MACD、ATR）特徵工程上，具備優異的收斂速度、抗過擬合能力以及極高的訊號分類勝率。然而，單純依賴機器學習分類模型通常將金融時序視為平穩或特徵獨立的輸入，忽視了市場在特定「價格空間結構」下的脈絡變化（Contextual Dynamics），容易在市場雜訊過多或發生突發性波動時產出大量無效訊號。
+2.2 LLM Agents and RAG in Financial Decision Making
+隨著生成式人工智慧的突破，LLM 於金融分析與多代理人決策系統（Multi-Agent Financial Systems）的研究呈現爆發性成長。如 TradingAgents (Xiao et al., 2024) 與 TradingGPT 等前沿架構，成功展示了透過角色分工（如分析師、研究員、交易員與風控官）與檢索增強生成（RAG）技術，機能性地整合非結構化新聞與總體經濟文本。然而，現有金融 LLM 系統普遍存在兩大致命缺陷：其一，LLM 對於精確的高頻數值運算與空間價格標記缺乏確定性（Deterministic Precision），極易產生「數值幻覺（Hallucination）」；其二，純文本提示詞（Prompts）無法精確捕捉 K 線圖表上的動態空間邊界（Spatial Boundaries）。
+2.3 Automated Support/Resistance and Price Action Algorithms
+價格行為學（Price Action）著重於由市場供需失衡（Supply & Demand Imbalance）所產生的關鍵空間區域（Zones）。近年研究試圖透過傳統統計演算法（如 Local Extrema Detection、Kernel Density Estimation, KDE、ZigZag 演算法與 Pivot Points）進行自動化支撐壓力（SNR）辨識。雖然這些確定性演算法能精確計算出價格水平線，但大多僅止於「線（Lines）」的靜態繪製，缺乏對動態「供需區塊（Zones）」的結構性辨識能力，更無法自動評估價格再次回測試探（Retest）時的勝率與期望值。
+2.4 Summary and Research Gap (現有研究對比與缺口分析)
+研究領域 / 代表架構
+空間結構感知
+數據計算與勝率
+脈絡推理與風控
+傳統指標量化/ML (e.g., XGBoost)
+無 (僅統計數值)
+強 (高勝率分類)
+無 (無推理能力)
+純 LLM 金融 Agent (e.g., TradingAgents)
+無 (僅依賴文本)
+弱 (易發生數值幻覺)
+強 (上下文邏輯推理)
+自動化 SNR 演算法 (e.g., KDE / Pivot)
+中 (僅靜態劃線)
+無 (純規則無預測)
+無 (無法評估機率)
+本專題提案 (Hybrid TPA-Agent)
+強 (確定性供需區演算法)
+強 (XGBoost 突破/反彈勝率)
+強 (LLM 結構化推理與風控)
+3. Deep Research: Three Core Theoretical & Engineering Questions
+3.1 Q1: Five Core Mindsets driving System Architecture
+1. Supply & Demand Imbalance Mindset (供需失衡思維)金融市場價格的本質由機構大單之訂單流（Order Flow）與供需失衡推動。起漲/起跌點即為機構未成交限價單堆積之供需區。直接導向系統中確定性 SNR 與供需區演算法之設計，精確標記買賣力道失衡區域。
+2. Probability & Expectation Mindset (機率與期望值思維)短線交易不存在 100% 確定之預測，關鍵在於數學期望值 E = (W x RR) - ((1 - W) x 1)。系統由 XGBoost 產出條件勝率預測值後，結合 SNR 空間距離計算 RR 值，僅針對 E > 0 且達門檻之訊號觸發。
+3. Price Action Context Mindset (價格行為結構思維)相同的技術指標訊號在不同的圖表空間結構位置具備截然不同的市場意涵與勝率。構成了 LLM 規劃與推理代理人進行多維度語意融合的情境推理邏輯。
+4. Risk-First Mindset (風險優先與資本保護思維)專業交易的第一原則是風險控制。在決定進場前，必須先客觀定義失效點（停損位置），再依據可承受之風險金額反推建倉規模。
+5. Adaptability to Volatility Mindset (不確定性與動態適應思維)市場波動度呈動態收縮與擴張週期（如 ATR）。Agent 在計算目標停利點與移動停損時，引入基於 ATR 的動態倍數調整機制。
+3.2 Q2: Three Critical Professional Controversies
+爭論一：全自動演算法交易 ↔ 混合式 AI 輔助決策 (Human-in-the-Loop)Fully Autonomous 追求毫秒級執行，但容易在極端黑天鵝事件中產生災難性穿倉。本系統達成「HITL 混合式 AI 代理人」共識：系統作為高智慧軍師產出完整證據鏈報告，由操盤手進行一鍵確認執行。
+爭論二：機械化技術指標 ↔ 主觀價格行為判定指標派追求 100% 客觀但具滯後性；價格行為派重視情境但過於主觀。本系統採用「分層解構」共識：第一層用確定性演算法將支撐壓力客觀化，第二層交由 LLM 進行多維度情境語意解讀。
+爭論三：歷史回測勝率 ↔ 盤中實時適應性歷史高勝率策略常因市場非站態性（Non-stationarity）而過擬合失效。本系統達成「動態濾網與極限失效機制」共識：即時審視成交量能與 ATR，特徵脫離常態時強制啟動安全降級。
+3.3 Q3: Ten Deep Understanding Questions
+1. Why：當價格帶量跌破需求區時，為何支撐會轉為強烈壓力？源於訂單流失衡與心理掛單轉換。需求區被向下貫穿代表買方限價單被完全消耗，大量多頭部位轉為浮虧套牢。當價格反彈回測試探時，套牢多頭保本平倉（賣出）加上突破空頭加碼，導至買盤枯竭、賣壓大增，形成 S/R Flip。
+2. What-if：低波動環境下突然出現帶量突破 K 線，ML 模型有何偏誤？容易產生「假突破的高估偏誤」。低波動量縮期流動性極薄，單一機構大單即可輕易推升價格形成大陽線。此時 Volume Z-score 等特徵暴增，促使 XGBoost 給予極高勝率，但後續缺乏跟進訂單，極易演變成掃清流動性的陷阱。
+3. Trade-off：縮小時間框架（Timeframe）以抓取更多進場點有何負面影響？存在「訊號頻率與信噪比」之權衡。時間框架越小（如 1 分鐘），進場機會顯著增加，但高頻 K 線充斥做市商刷單與隨機雜訊，結構穩定性極差，會標記出大量偽供需區，壓低勝率並因手續費與滑點侵蝕期望值。
+4. Failure Case：流動性枯竭時，基於成交量分佈的供需區偵測為何失效？此類演算法極度依賴真實市場參與者力道對決所留下的成交量峰值（HVN）。當市場處於假日或收盤前夕，市場深度極淺，極小散戶成交量即可能導致價格劇烈波動產生「失衡 K 線」，但背後並無機構未成交訂單支撐。
+5. Evidence：判斷價格回測是「有效反彈」還是「假跌破」的決定性特徵？1) 收盤位置：影線刺穿但收盤價強勢收回至需求區邊界之上（Hammer/Pinbar）；2) 量價比例：刺穿瞬間爆巨量但實體極小、下影線極長，顯示存在被動買盤吸收；3) 次級結構：低時間框架出現結構轉變（ChoCh）。
+6. Comparison：相較於均線交叉策略，供需區策略在風報比有何優勢？均線交叉屬於滯後型趨勢跟隨，進場時價格已運行一大段，停損點遠且難定義，RR 常低於 1:1.5。供需區策略能在價格回測確定性需求區時精準進場，停損緊貼需求區外側，目標看至下一供給區，數學上鎖定極高 RR（常達 1:3 至 1:5）。
+7. Design Decision：為何必須將「供需區運算」與「LLM 推理」徹底解耦？為了徹底解決 LLM 的「數值與空間幻覺」。LLM 擅長語意邏輯而不擅長浮點數精確計算與空間座標運算。將空間矩陣計算交由 100% 確定性的 Python 演算法執行，將算好的結構 JSON 餵給 LLM 進行情境語意推理，是保證系統嚴謹性的關鍵。
+8. Real-world Scenario：API 短暫延遲或斷流時，風控模組如何降級處理？採用分級降級協議：Level 1 (心跳包延遲 > 2s) 立即凍結新訊號產出；Level 2 (在途單防護) 將預先計算好的硬性停損單掛至交易所伺服器端；Level 3 (斷流 > 30s) 觸發熔斷機制警報，必要時強制市價平倉。
+9. Trade-off：要求 Agent 輸出極端高勝率對交易機會數量有何影響？存在「過濾器嚴格度與樣本數」的反比效應。過於苛刻的過濾條件會使交易機會數量呈現指數級壓縮（可能一週僅 1-2 筆），導致短線/當沖交易之資金利用率低下。
+10. Failure Case：遇到未曾見過的宏觀突發利空，ML 預測何處嚴重失准？ML 模型會遭受「分佈外數據 (OOD) 與概念飄移」打擊。當發生黑天鵝事件時，價格會在毫無技術指標徵兆的情況下直接貫穿需求區。此時 ML 模型因特徵仍處常態區間，會錯誤給出強烈反彈勝率，必須依賴 LLM 外部新聞感知與風控熔斷。
+4. System Architecture & Modules Description
+本系統採用四大階層（Tiers）共八個核心子模組之分塊架構設計：
+[1.1] User Preference Block (使用者偏好模組)接收與記錄使用者設定之交易目標、風險承受度（如單筆最大虧損比例）以及偏好的交易標的參數。
+[1.2] Data Ingestion Engine (資料接收引擎)透過即時與歷史 API 連線，動態抓取目標標的之高頻或歷史 OHLCV K 線數據以及成交量數據（Volume Profile）。
+[2.1] Deterministic Price Action & S&D Zone Engine (供需區算術引擎)透過 100% 確定性演算法，計算 K 線 Swing Highs/Lows 並結合成交量分佈辨識買賣失衡之支撐壓力區（SNR）與供需區。
+[2.2] Machine Learning Win-Rate Engine (勝率預測引擎)擷取技術指標與空間特徵，利用訓練好的 XGBoost 分類器模型計算價格突破或反彈之機率與期望勝率。
+[3.1] Domain Knowledge Base (領域知識庫)封裝專業價格行為學規則（如 S/R Flip、假突破型態、風控原則與動態 RR 公式），做為 LLM 推理時之檢索依據。
+[3.2] Planner & Reasoning Agent (規劃與推理代理人)整合空間座標、XGBoost 勝率分數，並結合知識庫進行 Chain-of-Thought (CoT) 鏈式推理，評估市場結構情境。
+[4.1] Decision & Risk Management Engine (決策與風控引擎)依據供需區邊界動態計算客觀停損位（Stop-Loss）與目標停利位（Take-Profit），算出一套兼具高勝率與優異風報比之建倉規格。
+[4.2] Output & Interactive Report Interface (結構化報告輸出介面)將最終決策結果彙整，產出包含進場點、停損點、期望勝率、風報比與價格行為推理依據之結構化報告。
+5. Core Algorithm Pseudocode (核心演算法虛擬碼)
+Algorithm 1: Hybrid Technical & Price Action Agent (Hybrid TPA-Agent)Input : Asset Symbol S, Timeframe TF, Current OHLCV Data DOutput: Actionable Trading Setup & Decision Report R01: Initialize Agent Context, SNR Algorithm, and ML Prediction Model02: Receive user target S and timeframe TF03: raw_data <- DataAcquisition.fetch_ohlcv(S, TF)04: 05: // 步驟一：確定性演算法計算支撐壓力與供需區06: demand_zones, supply_zones <- SNR_Engine.detect_zones(raw_data)07: current_price <- raw_data.close[-1]08: 09: // 步驟二：機器學習引擎計算突破/反彈勝率10: features <- FeatureExtractor.extract(raw_data, demand_zones, supply_zones)11: win_probability <- ML_Engine.predict_win_rate(features)12: 13: // 步驟三：AI Agent 進行領域推理與風控計算14: agent_context <- {current_price, demand_zones, win_probability}15: evaluated_plan <- PlannerAgent.reason(agent_context, PriceActionKnowledgeBase)16: 17: IF evaluated_plan.win_probability >= 0.55 AND evaluated_plan.risk_reward_ratio >= 2.0 THEN18:     entry_price <- current_price19:     stop_loss   <- evaluated_plan.recommended_stop_loss20:     take_profit <- evaluated_plan.recommended_take_profit21:     R <- SynthesisEngine.generate_report(Status="APPROVED", entry, stop_loss, take_profit, evaluated_plan.evidence)22: ELSE23:     R <- SynthesisEngine.generate_report(Status="WAIT/NO_TRADE", reason="Risk-to-Reward or Probability below threshold.")24: END IF25: 26: return R
